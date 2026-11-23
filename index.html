@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0d1f19">
+<title>REEF אשקלון · ש.ה.ב.ל תשתיות ומערכות מים</title>
+<link rel="icon" href="assets/logo-sm.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@200;300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="is-intro">
+
+<!-- ======= 3D canvas (shared by intro + building picker) ======= -->
+<div id="stage" aria-hidden="true"></div>
+
+<!-- ======= INTRO ======= -->
+<section id="intro" aria-label="פתיח">
+  <div class="intro-curtain" id="introCurtain">
+    <div class="ripple-rings"><i></i><i></i><i></i></div>
+    <div class="logo-plate logo-plate--hero" id="introLogo">
+      <img src="assets/logo-sm.png" alt="ש.ה.ב.ל תשתיות ומערכות מים בע״מ">
+    </div>
+    <p class="presents" id="introPresents">מציגה</p>
+  </div>
+
+  <div class="intro-hud" id="introHud">
+    <div class="hud-top">
+      <div class="logo-plate logo-plate--sm"><img src="assets/logo-sm.png" alt="ש.ה.ב.ל"></div>
+      <div class="hud-clock">
+        <span class="hud-label">אשקלון · שעון מקומי</span>
+        <span class="hud-time" id="hudTime">--:--</span>
+        <span class="hud-phase" id="hudPhase"></span>
+      </div>
+    </div>
+
+    <div class="hud-title">
+      <p class="eyebrow">ש.ה.ב.ל תשתיות ומערכות מים מציגה</p>
+      <h1 class="reef-word" id="reefWord"><span>R</span><span>E</span><span>E</span><span>F</span></h1>
+      <p class="reef-sub">מלון ריף · אשקלון</p>
+      <p class="reef-tag" id="reefTag">3 מגדלים · 10 מפלסים · 98 חדרים · מרתף</p>
+    </div>
+
+    <div class="hud-caption" id="hudCaption"></div>
+
+    <div class="hud-bottom">
+      <div class="tod-switch" role="group" aria-label="תאורת שעות היום">
+        <button data-tod="auto" class="on">עכשיו</button>
+        <button data-tod="7">בוקר</button>
+        <button data-tod="12.5">צהריים</button>
+        <button data-tod="16.6">שקיעה</button>
+        <button data-tod="21">לילה</button>
+      </div>
+      <button class="btn-enter" id="btnEnter">
+        <span>כניסה למערכת המעקב</span>
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </button>
+    </div>
+  </div>
+  <button class="btn-skip" id="btnSkip">דלג לפתיח ›</button>
+</section>
+
+<!-- ======= APP ======= -->
+<div id="app" hidden>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo-plate logo-plate--bar"><img src="assets/logo-sm.png" alt="ש.ה.ב.ל תשתיות ומערכות מים"></div>
+      <div class="brand-txt">
+        <strong>REEF · אשקלון</strong>
+        <span>מעקב אינסטלציה ומערכות מים · ש.ה.ב.ל</span>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-view="dashboard" class="on">דשבורד</button>
+      <button data-view="explore">בניינים וחדרים</button>
+      <button data-view="gaps">פערים <b class="pill" id="gapsBadge">0</b></button>
+      <button data-view="log">יומן פעילות</button>
+      <button data-view="settings">הגדרות</button>
+    </nav>
+    <div class="top-actions">
+      <span class="sync" id="syncState" title="מצב סנכרון"><i></i><em>מתחבר…</em></span>
+      <button class="btn-lock" id="btnLock"><svg viewBox="0 0 24 24" width="16" height="16"><rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 018 0v3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>צפייה בלבד</span></button>
+    </div>
+  </header>
+
+  <div class="demo-banner" id="demoBanner" hidden>
+    מצב הדגמה — הנתונים נשמרים בדפדפן זה בלבד. לחיבור לגוגל דרייב ראו README (הגדרת API_URL).
+  </div>
+
+  <main>
+    <!-- DASHBOARD -->
+    <section class="view on" id="view-dashboard">
+      <div class="dash-head">
+        <div>
+          <p class="eyebrow">פרויקט REEF · אשקלון</p>
+          <h2>תמונת מצב — אינסטלציה ומערכות מים</h2>
+          <p class="muted" id="dashUpdated"></p>
+        </div>
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="ring-bg"/><circle cx="60" cy="60" r="52" class="ring-fg" id="ringFg"/></svg>
+          <div class="ring-val"><b id="ringVal">0%</b><span>התקדמות כוללת</span></div>
+        </div>
+      </div>
+
+      <div class="kpis" id="kpis"></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-h"><h3>התקדמות לפי בניין</h3></div>
+          <div id="bldBars"></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>בדיקות מערכת</h3></div>
+          <div id="testStats"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+          <h3>מפת חום — כל החדרים לפי קומה ובניין</h3>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div class="heat" id="heat"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-h"><h3>פערים פתוחים</h3><button class="link" data-goto="gaps">לכל הפערים</button></div>
+          <div id="dashGaps" class="list"></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>אישורים אחרונים</h3></div>
+          <div id="dashApprovals" class="list"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h3>מרתף ושטחים ציבוריים</h3></div>
+        <div id="areasGrid" class="areas"></div>
+      </div>
+    </section>
+
+    <!-- EXPLORE -->
+    <section class="view" id="view-explore">
+      <div class="explore">
+        <div class="explore-3d" id="explore3d">
+          <div class="crumbs" id="crumbs"></div>
+          <p class="hint" id="exploreHint">בחרו בניין על גבי ההדמיה</p>
+          <div class="bld-chips" id="bldChips"></div>
+          <div class="floor-rail" id="floorRail" hidden></div>
+        </div>
+        <div class="explore-plan" id="explorePlan">
+          <div class="plan-empty" id="planEmpty">
+            <div class="plan-empty-icon"><svg viewBox="0 0 64 64" width="56" height="56"><path d="M32 6c9 12 16 21 16 30a16 16 0 01-32 0c0-9 7-18 16-30z" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
+            <p>בחרו בניין ← מפלס ← חדר</p>
+          </div>
+          <div class="plan-wrap" id="planWrap" hidden>
+            <div class="plan-head">
+              <h3 id="planTitle"></h3>
+              <div class="plan-stats" id="planStats"></div>
+            </div>
+            <div class="plan-svg" id="planSvg"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GAPS -->
+    <section class="view" id="view-gaps">
+      <div class="view-h">
+        <h2>פערים וליקויים</h2>
+        <div class="seg" id="gapFilter"><button data-f="open" class="on">פתוחים</button><button data-f="closed">טופלו</button><button data-f="all">הכל</button></div>
+      </div>
+      <div id="gapsList" class="list list--big"></div>
+    </section>
+
+    <!-- LOG -->
+    <section class="view" id="view-log">
+      <div class="view-h"><h2>יומן פעילות</h2><button class="btn-ghost" id="btnExport">ייצוא CSV</button></div>
+      <div id="logList" class="list list--log"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="view-settings">
+      <div class="view-h"><h2>הגדרות</h2></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-h"><h3>החלפת קוד גישה</h3></div>
+          <p class="muted">רק מי שמחובר במצב עריכה יכול להחליף את הקוד. הקוד לעולם לא נשמר בקוד האתר — הוא מאומת בשרת (Google Apps Script) ונשמר כגיבוב מוצפן.</p>
+          <form id="formCode" class="form" autocomplete="off">
+            <label>קוד נוכחי<input type="password" name="old" required></label>
+            <label>קוד חדש (6 תווים לפחות)<input type="password" name="nw" required minlength="6"></label>
+            <label>אימות קוד חדש<input type="password" name="nw2" required minlength="6"></label>
+            <button class="btn-gold" type="submit">עדכון קוד</button>
+          </form>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>מבנה הפרויקט</h3></div>
+          <p class="muted">ברירת מחדל לפי התוכנית: 12 חדרים לקומה (4 בכל בניין), קומות 1–8 מלאות + 2 סוויטות בקומה 9 = 98 חדרים. אפשר להפעיל או לכבות חדרים במצב עריכה.</p>
+          <div id="structureEditor"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h3>על המערכת</h3></div>
+        <p class="muted">המערכת פותחה עבור <b>ש.ה.ב.ל תשתיות ומערכות מים בע״מ</b> · טל׳ 054-6947773 · לניהול ומעקב עבודות אינסטלציה בפרויקט מלון ריף, אשקלון. כל עדכון נשמר אוטומטית בגוגל דרייב של החברה, כולל יומן מלא בגיליון וגיבוי יומי.</p>
+        <div class="settings-actions" id="demoActions" hidden>
+          <button class="btn-ghost" id="btnSeed">טעינת נתוני הדגמה</button>
+          <button class="btn-ghost danger" id="btnReset">איפוס נתוני הדגמה</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="logo-plate logo-plate--foot"><img src="assets/logo-sm.png" alt="ש.ה.ב.ל"></div>
+    <span>ש.ה.ב.ל תשתיות ומערכות מים בע״מ · 054-6947773</span>
+    <span class="muted">פרויקט מלון ריף · אשקלון</span>
+  </footer>
+</div>
+
+<!-- ======= ROOM DRAWER ======= -->
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-in" id="drawerIn"></div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<!-- ======= LOGIN ======= -->
+<dialog id="dlgLogin" class="dlg">
+  <form method="dialog" id="formLogin" autocomplete="off">
+    <div class="logo-plate logo-plate--sm"><img src="assets/logo-sm.png" alt=""></div>
+    <h3>כניסה למצב עריכה</h3>
+    <p class="muted">עדכון נתונים מותר רק עם קוד החברה. כל שינוי נרשם ביומן עם שם המעדכן.</p>
+    <label>שם מלא של המעדכן<input name="who" required maxlength="40" placeholder="לדוגמה: משה כהן"></label>
+    <label>קוד גישה<input name="code" type="password" required maxlength="64"></label>
+    <p class="err" id="loginErr"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn-ghost" value="cancel" id="loginCancel">ביטול</button>
+      <button type="submit" class="btn-gold" id="loginSubmit">כניסה</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
